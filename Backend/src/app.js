@@ -33,7 +33,10 @@ app.post("/api/post/data", (req, res) => {
   });
 });
 
-app.get("/api/get/user/1", (req, res) => {
+app.get("/api/get/user", (req, res) => {
+
+    console.log(req.query);
+
   res.json({
     success: true,
     message: "ok",
@@ -55,5 +58,20 @@ app.delete("/api/delete/user/1", (req, res) => {
   res.json({
     success: true,
     message: "data deleted successfully",
+  });
+});
+
+app.get("/api/get/user/:userId", (req, res) => {
+
+    console.log(req.params);
+
+  res.json({
+    success: true,
+    message: "ok",
+    data: {
+      firstName: "Ameer",
+      lastName: "Khan",
+    },
+    userId: req.params
   });
 });
