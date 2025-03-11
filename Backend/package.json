@@ -4,7 +4,7 @@
   "description": "backend file for DevTinder",
   "license": "ISC",
   "author": "Ameer Khan",
-  "type": "commonjs",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "start": "node src/app.js",
