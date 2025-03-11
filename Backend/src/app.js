@@ -1,4 +1,5 @@
 import express from "express";
+import { adminAuthFunction, userAuthFunction } from "./middlewares/auth.js";
 
 const app = express();
 app.use(express.json());
@@ -7,71 +8,20 @@ app.listen(8080, () => {
   console.log("SERVER IS LISTENING TO PORT: 8080");
 });
 
-// app.use("/", (req, res) => {
-//     res.send("HELLO FROM / ");
-//  });
+app.use("/api/admin", adminAuthFunction);
 
-app.use("/api/helloworld", (req, res) => {
-  res.send("/API/HELLOWORLD");
+app.get("/api/admin/get-user", (req, res) => {
+  res.send("/api/admin/get-user");
 });
 
-app.get("/", (req, res) => {
-  res.send("GET /");
+app.get("/api/admin/delete-user", (req, res) => {
+  res.send("/api/admin/delete-user");
 });
 
-app.use("/api/test", (req, res) => {
-  res.send("/API/TEST");
+app.get("/api/user/create", (req, res) => {
+  res.send("user created successfully");
 });
 
-app.post("/api/post/data", (req, res) => {
-  console.log(req.body);
-
-  res.json({
-    success: true,
-    message: "POST call ok",
-    data: req.body,
-  });
-});
-
-app.get("/api/get/user", (req, res) => {
-
-    console.log(req.query);
-
-  res.json({
-    success: true,
-    message: "ok",
-    data: {
-      firstName: "Ameer",
-      lastName: "Khan",
-    },
-  });
-});
-
-app.patch("/api/update/user/1", (req, res) => {
-  res.json({
-    success: true,
-    message: "data updated successfully",
-  });
-});
-
-app.delete("/api/delete/user/1", (req, res) => {
-  res.json({
-    success: true,
-    message: "data deleted successfully",
-  });
-});
-
-app.get("/api/get/user/:userId", (req, res) => {
-
-    console.log(req.params);
-
-  res.json({
-    success: true,
-    message: "ok",
-    data: {
-      firstName: "Ameer",
-      lastName: "Khan",
-    },
-    userId: req.params
-  });
+app.get("/api/user/login", userAuthFunction, (req, res) => {
+  res.send("user login successful");
 });
