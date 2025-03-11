@@ -1,12 +1,19 @@
 import express from "express";
 import { adminAuthFunction, userAuthFunction } from "./middlewares/auth.js";
+import { connectDB } from "./config/database.js";
 
 const app = express();
 app.use(express.json());
 
-app.listen(8080, () => {
-  console.log("SERVER IS LISTENING TO PORT: 8080");
-});
+connectDB()
+  .then(() => {
+    app.listen(8080, () => {
+      console.log("SERVER IS LISTENING TO PORT: 8080");
+    });
+  })
+  .catch((e) => {
+    console.log(e);
+  });
 
 app.use("/api/admin", adminAuthFunction);
 
