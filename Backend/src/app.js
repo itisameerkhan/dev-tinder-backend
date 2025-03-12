@@ -17,15 +17,7 @@ connectDB()
 
 app.post("/api/user/new", async (req, res) => {
   try {
-    const { firstName, lastName, emailId, password, age, gender } = req.body;
-    const user = new User({
-      firstName,
-      lastName,
-      emailId,
-      password,
-      age,
-      gender,
-    });
+    const user = new User(req.body);
 
     await user.save();
 
@@ -35,6 +27,19 @@ app.post("/api/user/new", async (req, res) => {
     });
   } catch (e) {
     console.log(e);
+    if (e.code === 11000) {
+      res.json({
+        success: false,
+        message: "user already exists, duplicate insertion",
+      });
+    } else {
+      res.status(e.code || 400).json({
+        success: false,
+        message: "something went wrong",
+        error: e.message,
+        errorCode: e.code || 400,
+      });
+    }
   }
 });
 
@@ -129,10 +134,31 @@ app.delete("/api/delete/user/:_id", async (req, res) => {
 
 app.patch("/api/update/user/:_id", async (req, res) => {
   try {
-    const user = await User.findByIdAndUpdate(req.params._id, {
-      firstName: req.body?.firstName,
-      lastName: req.body?.lastName,
+    const ALLOWED_UPDATES = [
+      "firstName",
+      "lastName",
+      "password",
+      "age",
+      "gender",
+      "photoURL",
+      "about",
+      "skills",
+      "phoneNumber",
+    ];
+
+    const isUpdateAllowed = Object.keys(req.body).every((k) =>
+      ALLOWED_UPDATES.includes(k)
+    );
+
+    if (!isUpdateAllowed) {
+      throw new Error("updation not possible")
+    }
+
+    const user = await User.findByIdAndUpdate(req.params._id, req.body, {
+      returnDocument: "after",
+      runValidators: true,
     });
+
     if (user) {
       res.json({
         success: true,
@@ -144,8 +170,8 @@ app.patch("/api/update/user/:_id", async (req, res) => {
   } catch (e) {
     res.json({
       success: false,
-      message: "something went wrong",
-      error: e,
+      message: e.message || "something went wrong",
+      error: e || "no error found",
     });
   }
 });
@@ -176,6 +202,68 @@ app.patch("/api/update/user", async (req, res) => {
       success: false,
       message: "something went wrong",
       error: error,
+    });
+  }
+});
+
+app.delete("/api/delete/user", async (req, res) => {
+  try {
+    const user = await User.deleteOne({ emailId: req.body?.emailId });
+
+    if (user.deletedCount > 0) {
+      res.json({
+        success: true,
+        message: "user deletion successful",
+      });
+    } else {
+      throw new Error("something went wrong");
+    }
+  } catch (e) {
+    res.json({
+      success: false,
+      message: "something went wrong",
+    });
+  }
+});
+
+app.delete("/api/delete/users", async (req, res) => {
+  try {
+    const user = await User.deleteMany({ emailId: req.body?.emailId });
+
+    if (user.deletedCount > 0) {
+      res.json({
+        success: true,
+        message: "user deletion successful",
+      });
+    } else {
+      throw new Error("something went wrong");
+    }
+  } catch (e) {
+    res.json({
+      success: false,
+      message: "something went wrong",
+    });
+  }
+});
+
+app.get("/api/exists/user", async (req, res) => {
+  try {
+    const user = await User.exists({ emailId: req.body?.emailId });
+    console.log(user);
+
+    if (user) {
+      res.json({
+        success: true,
+        message: "user exists",
+        data: user,
+      });
+    } else {
+      throw new Error();
+    }
+  } catch (error) {
+    res.json({
+      success: false,
+      message: "something went wrong",
     });
   }
 });
