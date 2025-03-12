@@ -4,7 +4,7 @@ export const adminAuthFunction = (req, res, next) => {
     next();
   } else {
     // res.status(401).send("invalid token");
-    throw new Error("INVALID AUTHENTICATION")
+    throw new Error("INVALID AUTHENTICATION");
   }
 };
 
