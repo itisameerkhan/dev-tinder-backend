@@ -1,6 +1,9 @@
 import express from "express";
 import { connectDB } from "./config/database.js";
 import { User } from "./models/user.js";
+import { validateNewUser } from "./utils/validation.js";
+import bcrypt from "bcrypt";
+import validator from "validator";
 
 const app = express();
 app.use(express.json());
@@ -17,7 +20,33 @@ connectDB()
 
 app.post("/api/user/new", async (req, res) => {
   try {
-    const user = new User(req.body);
+    // validateNewUser(req);
+    const {
+      firstName,
+      lastName,
+      emailId,
+      password,
+      age,
+      gender,
+      phoneNumber,
+      skills,
+      photoURL,
+    } = req.body;
+
+    const passwordHash = await bcrypt.hash(password, 10);
+    // console.log(passwordHash);
+
+    const user = new User({
+      firstName,
+      lastName,
+      emailId,
+      age,
+      gender,
+      skills,
+      photoURL,
+      phoneNumber,
+      password: passwordHash,
+    });
 
     await user.save();
 
@@ -26,20 +55,12 @@ app.post("/api/user/new", async (req, res) => {
       message: "data created successfully",
     });
   } catch (e) {
-    console.log(e);
-    if (e.code === 11000) {
-      res.json({
-        success: false,
-        message: "user already exists, duplicate insertion",
-      });
-    } else {
-      res.status(e.code || 400).json({
-        success: false,
-        message: "something went wrong",
-        error: e.message,
-        errorCode: e.code || 400,
-      });
-    }
+    res.status(e.code || 400).json({
+      success: false,
+      message: "something went wrong",
+      error: e.message,
+      errorCode: e.code || 400,
+    });
   }
 });
 
@@ -151,7 +172,7 @@ app.patch("/api/update/user/:_id", async (req, res) => {
     );
 
     if (!isUpdateAllowed) {
-      throw new Error("updation not possible")
+      throw new Error("updation not possible");
     }
 
     const user = await User.findByIdAndUpdate(req.params._id, req.body, {
@@ -264,6 +285,39 @@ app.get("/api/exists/user", async (req, res) => {
     res.json({
       success: false,
       message: "something went wrong",
+    });
+  }
+});
+
+app.post("/api/login", async (req, res) => {
+  try {
+    const { emailId, password } = req.body;
+
+    if (!validator.isEmail(emailId)) {
+      throw new Error("invalid credentials");
+    }
+
+    const user = await User.findOne({ emailId: emailId });
+
+    if (!user) {
+      throw new Error("user not found");
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      throw new Error("invalid credentials");
+    }
+
+    res.json({
+      success: true,
+      message: "login successful",
+    });
+
+  } catch (e) {
+    res.json({
+      success: false,
+      message: e.message || "something went wrong",
     });
   }
 });
