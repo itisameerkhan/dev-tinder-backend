@@ -1,12 +1,15 @@
 import express from "express";
 import { connectDB } from "./config/database.js";
 import { User } from "./models/user.js";
-import { validateNewUser } from "./utils/validation.js";
 import bcrypt from "bcrypt";
 import validator from "validator";
+import cookieParser from "cookie-parser";
+import jwt from "jsonwebtoken";
+import { userAuth } from "./middlewares/auth.js";
 
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 
 connectDB()
   .then(() => {
@@ -303,21 +306,56 @@ app.post("/api/login", async (req, res) => {
       throw new Error("user not found");
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = user.validatePassword(password);
 
     if (!isPasswordValid) {
       throw new Error("invalid credentials");
     }
 
+    const token = await user.getJWT();
+
+    res.cookie("token", token);
+
     res.json({
       success: true,
       message: "login successful",
+      token: token,
     });
-
   } catch (e) {
     res.json({
       success: false,
       message: e.message || "something went wrong",
+    });
+  }
+});
+
+app.get("/api/profile", userAuth, async (req, res) => {
+  try {
+    res.json({
+      success: true,
+      message: "everything fine",
+      user: req.user,
+    });
+  } catch (e) {
+    res.json({
+      success: false,
+      message: "something went wrong",
+      error: e.message,
+    });
+  }
+});
+
+app.post("/api/send-connection-request", userAuth, async (req, res) => {
+  try {
+    res.json({
+      success: true,
+      message: "sending connection request",
+    });
+  } catch (e) {
+    res.json({
+      success: false,
+      message: "something went wrong",
+      error: e.message,
     });
   }
 });
