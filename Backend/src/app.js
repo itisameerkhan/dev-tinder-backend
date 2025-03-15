@@ -1,11 +1,10 @@
 import express from "express";
 import { connectDB } from "./config/database.js";
 import { User } from "./models/user.js";
-import bcrypt from "bcrypt";
-import validator from "validator";
 import cookieParser from "cookie-parser";
-import jwt from "jsonwebtoken";
-import { userAuth } from "./middlewares/auth.js";
+import authRouter from "./routes/auth.js";
+import profileRouter from "./routes/profile.js";
+import requestRouter from "./routes/requests.js";
 
 const app = express();
 app.use(express.json());
@@ -21,51 +20,55 @@ connectDB()
     console.log(e);
   });
 
-app.post("/api/user/new", async (req, res) => {
-  try {
-    // validateNewUser(req);
-    const {
-      firstName,
-      lastName,
-      emailId,
-      password,
-      age,
-      gender,
-      phoneNumber,
-      skills,
-      photoURL,
-    } = req.body;
+app.use("/", authRouter);
+app.use("/", profileRouter);
+app.use("/", requestRouter);
 
-    const passwordHash = await bcrypt.hash(password, 10);
-    // console.log(passwordHash);
+// app.post("/api/user/new", async (req, res) => {
+//   try {
+//     // validateNewUser(req);
+//     const {
+//       firstName,
+//       lastName,
+//       emailId,
+//       password,
+//       age,
+//       gender,
+//       phoneNumber,
+//       skills,
+//       photoURL,
+//     } = req.body;
 
-    const user = new User({
-      firstName,
-      lastName,
-      emailId,
-      age,
-      gender,
-      skills,
-      photoURL,
-      phoneNumber,
-      password: passwordHash,
-    });
+//     const passwordHash = await bcrypt.hash(password, 10);
+//     // console.log(passwordHash);
 
-    await user.save();
+//     const user = new User({
+//       firstName,
+//       lastName,
+//       emailId,
+//       age,
+//       gender,
+//       skills,
+//       photoURL,
+//       phoneNumber,
+//       password: passwordHash,
+//     });
 
-    res.json({
-      success: true,
-      message: "data created successfully",
-    });
-  } catch (e) {
-    res.status(e.code || 400).json({
-      success: false,
-      message: "something went wrong",
-      error: e.message,
-      errorCode: e.code || 400,
-    });
-  }
-});
+//     await user.save();
+
+//     res.json({
+//       success: true,
+//       message: "data created successfully",
+//     });
+//   } catch (e) {
+//     res.status(e.code || 400).json({
+//       success: false,
+//       message: "something went wrong",
+//       error: e.message,
+//       errorCode: e.code || 400,
+//     });
+//   }
+// });
 
 app.get("/api/get/users", async (req, res) => {
   try {
@@ -292,70 +295,70 @@ app.get("/api/exists/user", async (req, res) => {
   }
 });
 
-app.post("/api/login", async (req, res) => {
-  try {
-    const { emailId, password } = req.body;
+// app.post("/api/login", async (req, res) => {
+//   try {
+//     const { emailId, password } = req.body;
 
-    if (!validator.isEmail(emailId)) {
-      throw new Error("invalid credentials");
-    }
+//     if (!validator.isEmail(emailId)) {
+//       throw new Error("invalid credentials");
+//     }
 
-    const user = await User.findOne({ emailId: emailId });
+//     const user = await User.findOne({ emailId: emailId });
 
-    if (!user) {
-      throw new Error("user not found");
-    }
+//     if (!user) {
+//       throw new Error("user not found");
+//     }
 
-    const isPasswordValid = user.validatePassword(password);
+//     const isPasswordValid = user.validatePassword(password);
 
-    if (!isPasswordValid) {
-      throw new Error("invalid credentials");
-    }
+//     if (!isPasswordValid) {
+//       throw new Error("invalid credentials");
+//     }
 
-    const token = await user.getJWT();
+//     const token = await user.getJWT();
 
-    res.cookie("token", token);
+//     res.cookie("token", token);
 
-    res.json({
-      success: true,
-      message: "login successful",
-      token: token,
-    });
-  } catch (e) {
-    res.json({
-      success: false,
-      message: e.message || "something went wrong",
-    });
-  }
-});
+//     res.json({
+//       success: true,
+//       message: "login successful",
+//       token: token,
+//     });
+//   } catch (e) {
+//     res.json({
+//       success: false,
+//       message: e.message || "something went wrong",
+//     });
+//   }
+// });
 
-app.get("/api/profile", userAuth, async (req, res) => {
-  try {
-    res.json({
-      success: true,
-      message: "everything fine",
-      user: req.user,
-    });
-  } catch (e) {
-    res.json({
-      success: false,
-      message: "something went wrong",
-      error: e.message,
-    });
-  }
-});
+// app.get("/api/profile", userAuth, async (req, res) => {
+//   try {
+//     res.json({
+//       success: true,
+//       message: "everything fine",
+//       user: req.user,
+//     });
+//   } catch (e) {
+//     res.json({
+//       success: false,
+//       message: "something went wrong",
+//       error: e.message,
+//     });
+//   }
+// });
 
-app.post("/api/send-connection-request", userAuth, async (req, res) => {
-  try {
-    res.json({
-      success: true,
-      message: "sending connection request",
-    });
-  } catch (e) {
-    res.json({
-      success: false,
-      message: "something went wrong",
-      error: e.message,
-    });
-  }
-});
+// app.post("/api/send-connection-request", userAuth, async (req, res) => {
+//   try {
+//     res.json({
+//       success: true,
+//       message: "sending connection request",
+//     });
+//   } catch (e) {
+//     res.json({
+//       success: false,
+//       message: "something went wrong",
+//       error: e.message,
+//     });
+//   }
+// });
