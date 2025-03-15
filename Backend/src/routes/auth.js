@@ -65,7 +65,7 @@ authRouter.post("/api/login", async (req, res) => {
       throw new Error("user not found");
     }
 
-    const isPasswordValid = user.validatePassword(password);
+    const isPasswordValid = await user.validatePassword(password);    
 
     if (!isPasswordValid) {
       throw new Error("invalid credentials");

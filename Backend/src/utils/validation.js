@@ -13,3 +13,22 @@ export const validateNewUser = async (req) => {
     throw new Error("password is not strong");
   }
 };
+
+export const validateProfileEdit = (req) => {
+  const ALLOWED_UPDATES = [
+    "firstName",
+    "lastName",
+    "gender",
+    "age",
+    "photoURL",
+    "phoneNumber",
+    "skills",
+    "about",
+  ];
+
+  const isEditAllowed = Object.keys(req.body).every((field) =>
+    ALLOWED_UPDATES.includes(field)
+  );
+
+  return isEditAllowed;
+};
