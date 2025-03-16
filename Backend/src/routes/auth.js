@@ -41,12 +41,13 @@ authRouter.post("/api/user/new", async (req, res) => {
       success: true,
       message: "data created successfully",
     });
+
   } catch (e) {
-    res.status(e.code || 400).json({
+    res.status(400).json({
       success: false,
       message: "something went wrong",
       error: e.message,
-      errorCode: e.code || 400,
+      errorCode: 400,
     });
   }
 });
