@@ -11,11 +11,11 @@ profileRouter.get("/api/profile/view", userAuth, async (req, res) => {
   try {
     res.json({
       success: true,
-      message: "everything fine",
-      user: req.user,
+      message: "user login successfull",
+      data: req.user,
     });
   } catch (e) {
-    res.json({
+    res.status(400).json({
       success: false,
       message: "something went wrong",
       error: e.message,
@@ -39,6 +39,7 @@ profileRouter.patch("/api/edit/profile", userAuth, async (req, res) => {
       success: true,
       message: "user updated successfully",
     });
+    
   } catch (e) {
     res.status(400).json({
       success: false,

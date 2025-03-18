@@ -79,7 +79,7 @@ authRouter.post("/api/login", async (req, res) => {
     res.json({
       success: true,
       message: "login successful",
-      token: token,
+      data: user
     });
   } catch (e) {
     res.json({

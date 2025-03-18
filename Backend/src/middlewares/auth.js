@@ -8,26 +8,30 @@ export const userAuth = async (req, res, next) => {
     const { token } = cookies;
 
     if (!token) {
-      throw new Error("invalid token");
-    }
+      return res.status(401).json({
+        success: false,
+        message: "Invalid token, user not found",
+      });
+    } 
 
     const decodedObj = jwt.verify(token, "secret-key");
     const { _id } = decodedObj;
 
     const user = await User.findById(_id);
     if (!user) {
-      throw new Error("user does not exist");
+      res.status(401).json({
+        success: false,
+        message: "invalid token, user not logged in",
+      });
     }
 
     req.user = user;
-    
-    next();
 
+    next();
   } catch (e) {
-    res.status(400).json({
+    res.json({
       success: false,
-      message: "something went wrong",
-      error: e.message,
+      message: e.message,
     });
   }
 };
