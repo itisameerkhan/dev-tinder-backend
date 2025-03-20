@@ -39,12 +39,11 @@ profileRouter.patch("/api/edit/profile", userAuth, async (req, res) => {
       success: true,
       message: "user updated successfully",
     });
-    
+
   } catch (e) {
     res.status(400).json({
       success: false,
-      message: "something went wrong",
-      error: e.message,
+      message: e.message,
     });
   }
 });
@@ -81,9 +80,7 @@ profileRouter.patch(
 
       const newHashedPassword = await bcrypt.hash(newPassword, 10);
 
-      console.log(loggedInUser.password);
-      loggedInUser.password = newHashedPassword;
-      console.log(loggedInUser.password);
+      loggedInUser.password = newHashedPassword; 
 
       await loggedInUser.save();
 

@@ -18,12 +18,12 @@ export const validateProfileEdit = (req) => {
   const ALLOWED_UPDATES = [
     "firstName",
     "lastName",
-    "gender",
+    "gender", 
     "age",
     "photoURL",
     "phoneNumber",
     "skills",
-    "about",
+    "about", 
   ];
 
   const isEditAllowed = Object.keys(req.body).every((field) =>
