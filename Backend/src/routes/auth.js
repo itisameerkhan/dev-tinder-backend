@@ -35,18 +35,22 @@ authRouter.post("/api/user/new", async (req, res) => {
       password: passwordHash,
     });
 
-    await user.save();
+    const savedUser = await user.save();
+
+    const token = await savedUser.getJWT();
+    
+    res.cookie("token", token);
 
     res.json({
       success: true,
       message: "data created successfully",
+      data: savedUser,
     });
 
   } catch (e) {
     res.status(400).json({
       success: false,
-      message: "something went wrong",
-      error: e.message,
+      message: e.message,
       errorCode: 400,
     });
   }

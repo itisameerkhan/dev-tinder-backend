@@ -36,12 +36,10 @@ const userSchema = new mongoose.Schema(
     },
     age: {
       type: Number,
-      required: true,
       min: 18,
     },
     gender: {
       type: String,
-      required: true,
       enum: {
         values: ["male", "female"],
         message: `{VALUE} is not a valid gender type`,
@@ -49,7 +47,8 @@ const userSchema = new mongoose.Schema(
     },
     photoURL: {
       type: String,
-      default: "www.default-photo.com",
+      default:
+        "https://img.freepik.com/premium-vector/social-media-logo_1305298-29989.jpg",
       validate(value) {
         if (!validator.isURL(value)) {
           throw new Error("invalid photo URL");
@@ -70,7 +69,6 @@ const userSchema = new mongoose.Schema(
     },
     phoneNumber: {
       type: String,
-      required: true,
       validate(value) {
         if (!validator.isMobilePhone(value)) {
           throw new Error("invalid mobile number");
