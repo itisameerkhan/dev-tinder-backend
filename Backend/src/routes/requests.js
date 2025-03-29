@@ -3,6 +3,7 @@ import { userAuth } from "../middlewares/auth.js";
 const requestRouter = express.Router();
 import { ConnectionRequest } from "../models/connectionRequest.js";
 import { User } from "../models/user.js";
+import { run } from "../utils/sendEmail.js";
 
 requestRouter.post(
   "/api/send-connection-request",
@@ -67,7 +68,12 @@ requestRouter.post(
         status,
       });
 
+      const emailRes = await run();
+      console.log(emailRes);
+      
       const data = await connectionRequestModel.save();
+
+
 
       const message =
         status == "interested"
@@ -80,10 +86,12 @@ requestRouter.post(
         data: data,
       });
     } catch (e) {
+
+      console.log(e);
+
       res.status(400).json({
         success: false,
-        message: "something went wrong",
-        error: e.message,
+        message: e.message,
       });
     }
   }
@@ -108,7 +116,6 @@ requestRouter.post(
         toUserId: loggedInUser._id,
         status: "interested",
       });
-      
 
       if (!connectionRequest) {
         throw new Error("connection request not found");
@@ -119,7 +126,7 @@ requestRouter.post(
 
       res.json({
         success: true,
-        message: "connection request " + status, 
+        message: "connection request " + status,
       });
     } catch (e) {
       res.status(400).json({
