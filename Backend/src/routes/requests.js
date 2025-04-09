@@ -3,7 +3,6 @@ import { userAuth } from "../middlewares/auth.js";
 const requestRouter = express.Router();
 import { ConnectionRequest } from "../models/connectionRequest.js";
 import { User } from "../models/user.js";
-import { run } from "../utils/sendEmail.js";
 
 requestRouter.post(
   "/api/send-connection-request",
@@ -68,12 +67,7 @@ requestRouter.post(
         status,
       });
 
-      const emailRes = await run();
-      console.log(emailRes);
-      
       const data = await connectionRequestModel.save();
-
-
 
       const message =
         status == "interested"
