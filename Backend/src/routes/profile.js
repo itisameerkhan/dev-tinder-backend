@@ -88,6 +88,7 @@ profileRouter.patch(
         success: true,
         message: "password reset successfull",
       });
+      
     } catch (e) {
       res.json({
         success: false,
