@@ -8,6 +8,7 @@ import requestRouter from "./routes/requests.js";
 import userRouter from "./routes/user.js";
 import cors from "cors";
 import dotenv from "dotenv";
+import "./utils/cronjob.js";
 
 const app = express();
 app.use(express.json());
