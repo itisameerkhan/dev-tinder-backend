@@ -1,5 +1,5 @@
 import cron from "node-cron";
 
-cron.schedule("* * * * *", () => {
+cron.schedule("0 8 * * *", () => {
   console.log("Hello, World", new Date());
 });
